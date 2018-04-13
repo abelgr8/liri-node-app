@@ -1,6 +1,13 @@
 # liri-node-app
 
+
+
 ### What Each Command Should Do
+
+#please note: .env file should also include a key for omdb
+
+#OMDB 
+OMDB_API_KEY='######'
 
 1. `node liri.js my-tweets`
 
