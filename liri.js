@@ -2,10 +2,11 @@ require("dotenv").config();
 var log = require('console-emoji')
 var keys = require("./keys.js");
 
-
+var fs = require("fs");
 var Twitter = require('twitter');
 var Spotify = require('node-spotify-api');
 var request = require('request');
+
 
 
 //Twitter==============================================================//
@@ -39,6 +40,12 @@ var artistName = function (artist) {
 var getSpotify = function (songName) {
     var spotify = new Spotify(keys.spotify);
 
+    var songName = process.argv[3];
+
+    if (songName == null) {
+        songName = 'The Sign by Ace of Base';
+    }
+
     spotify.search({
         type: 'track',
         query: songName,
@@ -60,21 +67,46 @@ var getSpotify = function (songName) {
 // Request============================================================//
 
 var movReq = function (movieName) {
+    var movieName = process.argv[3];
+
+    if (movieName == null) {
+        movieName = 'Mr. Nobody';
+    }
 
     request("http://www.omdbapi.com/?t=" + movieName + "&apikey=" + keys.omdb, function (error, response, body) {
         if (!error && response.statusCode == 200) {
-            
+
             var movieData = JSON.parse(body);
-            
-            console.log('Title:'+ movieData.Title + "\nYear: " + movieData.Year + "\nRated: " + movieData.Rated + "\nIMDB Rating: " + movieData.imdbRating + "\nRotten Tomatoes Rating: " + movieData.Ratings[1].Value + "\nCountry: " + movieData.Country + "\nLanguage: " + movieData.Language + "\nPlot: " + movieData.Plot + "\nActors: " + movieData.Actors + "\nWebsite: " + movieData.Website);
+
+            console.log('Title:' + movieData.Title + "\nYear: " + movieData.Year + "\nRated: " + movieData.Rated + "\nIMDB Rating: " + movieData.imdbRating + "\nRotten Tomatoes Rating: " + movieData.Ratings[1].Value + "\nCountry: " + movieData.Country + "\nLanguage: " + movieData.Language + "\nPlot: " + movieData.Plot + "\nActors: " + movieData.Actors + "\nWebsite: " + movieData.Website);
         }
     })
 }
+
+//File system===============================================//
+
+var randomFile = function () {
+    fs.readFile("random.txt", "utf8", function (error, data) {
+
+        if (error) {
+            return console.log(error);
+        }
+
+        var dataArr = data.split(",");
+
+        if (dataArr.length == 2) {
+            pick(dataArr[0], dataArr[1]);
+        }else if (dataArr.length == 1 ) {
+            pick(dataArr[0]);
+        }
+    })
+};
 
 
 ///searches
 
 var pick = function (caseData, functionData) {
+    
     switch (caseData) {
         case "my-tweets":
             recentTweets();
@@ -84,6 +116,9 @@ var pick = function (caseData, functionData) {
             break;
         case "movie-this":
             movReq(functionData);
+            break;
+        case "do-what-it-says":
+            randomFile();
             break;
         default:
             log('⚆ _ ⚆ LIRI does not compute', 'red');
